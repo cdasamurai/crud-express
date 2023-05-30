@@ -1,15 +1,59 @@
 const connection = require('./db');
 const filterHelper = require('../services/FilterHelper');
+const {passwordHasher} = require('../services/PasswordHelper');
 
 async function insertUser(data) {
     const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password) VALUES (?, ?, ?, ?, ?, ?)";
+
+    //password hashing
+    data.password = await passwordHasher(data.password)
+
     let bodyResponse = {...data};
     
     return connection.promise().query(sql, Object.values(data))
     .then(async ([rows]) => { 
         bodyResponse.id = rows.insertId
+        //@TODO remove password from body
+        
+        return {status: 201, message: bodyResponse}
+    })
+    .catch(error => {
+        return {status: 500, message: error}
+    })
+}
+
+async function updateUser(id, data) {
+    let sqlQuery = "UPDATE user SET ";
+
+    for (let key in itemValue = Object.keys(data)) {
+        sqlQuery += `${itemValue[key]} = ?, `
+    }
+
+    sqlQuery = sqlQuery.slice(0, sqlQuery.length - 2);
+
+    sqlQuery += ` WHERE id = ${id}`;
+
+    let bodyResponse = {...data};
+    
+    return connection.promise().query(sqlQuery, Object.values(data))
+    .then(async ([rows]) => { 
+        //bodyResponse.id = rows.insertId
+        //@TODO remove password from body
 
         return {status: 201, message: bodyResponse}
+    })
+    .catch(error => {
+        return {status: 500, message: error}
+    })
+}
+
+async function deleteUser(id) {
+    let sqlQuery = `DELETE FROM user where id = ${id}`;
+    
+    return connection.promise().query(sqlQuery)
+    .then(async ([rows]) => { 
+
+        return {status: 200, message: {}}
     })
     .catch(error => {
         return {status: 500, message: error}
@@ -32,8 +76,8 @@ async function fetchOneUser(id) {
     const sql = "SELECT * FROM user WHERE id = ?";
     
     return connection.promise().query(sql, id)
-    .then(async ([rows]) => { 
-        return {status: 200, message: rows[0]}
+    .then(async ([rows]) => {
+        return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: rows[0]}
     })
     .catch(error => {
         return {status: 500, message: error}
@@ -43,6 +87,8 @@ async function fetchOneUser(id) {
 async function fetchUserBy(filter) {
     //search filter (that contain)
     let {sql, values } = filterHelper.checkKindOfFilter(filter);
+
+
     //order filter (sorting)
 
     //date filter 
@@ -61,5 +107,7 @@ module.exports = {
     insertUser,
     fetchUser,
     fetchOneUser,
-    fetchUserBy
+    fetchUserBy,
+    updateUser,
+    deleteUser
 }
