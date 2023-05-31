@@ -8,7 +8,7 @@ function searchFilterGenerator (filter) {
 }
 
 function checkKindOfFilter(filter) {
-    switch(false) {
+    switch(false) { 
         case !filter.search: return searchFilterGenerator(filter.search);
         break;
     }

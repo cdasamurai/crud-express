@@ -1,6 +1,7 @@
 const connection = require('./db');
 const filterHelper = require('../services/FilterHelper');
 const {passwordHasher} = require('../services/PasswordHelper');
+const User = require('../entity/User');
 
 async function insertUser(data) {
     const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password) VALUES (?, ?, ?, ?, ?, ?)";
@@ -77,7 +78,10 @@ async function fetchOneUser(id) {
     
     return connection.promise().query(sql, id)
     .then(async ([rows]) => {
-        return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: rows[0]}
+        let user = new User();
+        Object.keys(rows[0]).map(item => { user[item] = rows[0][item] });
+        
+        return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: user}
     })
     .catch(error => {
         return {status: 500, message: error}
