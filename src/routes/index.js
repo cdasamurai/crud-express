@@ -1,8 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const securityMiddleware = require('../middleware/securityMiddleware')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', securityMiddleware, function(req, res, next) {
   res.json("coucou");
 });
 

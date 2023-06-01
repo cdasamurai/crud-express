@@ -4,7 +4,7 @@ const {passwordHasher} = require('../services/PasswordHelper');
 const User = require('../entity/User');
 
 async function insertUser(data) {
-    const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password) VALUES (?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     //password hashing
     data.password = await passwordHasher(data.password)
