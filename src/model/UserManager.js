@@ -75,11 +75,20 @@ async function fetchUser() {
 
 async function fetchOneUser(id) {
     const sql = "SELECT * FROM user WHERE id = ?";
-    
+
     return connection.promise().query(sql, id)
     .then(async ([rows]) => {
         let user = new User();
+        let userResult = rows[0];
+        /*user.id = userResult.id;
+        user.firstName = userResult.first_name;
+        user.lastName = userResult.last_name;
+        user.username = userResult.username;
+        user.address = userResult.address;
+        user.birthdate = userResult.birthdate;*/
+
         Object.keys(rows[0]).map(item => { user[item] = rows[0][item] });
+        //return console.log(user);
         
         return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: user}
     })
