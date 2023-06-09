@@ -2,3 +2,7 @@
 .env
 jwtRS256.key
 jwtRS256.key.pub
+.idea
+src/.DS_Store
+src/controller/.DS_Store
+.DS_Store
