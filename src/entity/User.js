@@ -1,17 +1,60 @@
 class User {
     #id;
-    #firstName = "";
-    #lastName = "";
+    #first_name = "";
+    #last_name = "";
     #birthdate = "";
     #email = "";
     #password = "";
     #address = "";
     #username = "";
 
-
     //getters
     get id() {
         return this.#id;
+    }
+
+    get first_name() {
+        return this.#first_name;
+    }
+
+    get last_name() {
+        return this.#last_name;
+    }
+
+    get birthdate() {
+        return this.#birthdate;
+    }
+
+    get email() {
+        return this.#email;
+    }
+
+    get password() {
+        return this.#password;
+    }
+
+    get address() {
+        return this.#address;
+    }
+
+    get username() {
+        return this.#username;
+    }
+
+    toJSON() {
+        return {
+            id: this.#id,
+            first_name: this.#first_name,
+            last_name: this.#last_name,
+            birthdate: this.#birthdate,
+            email: this.#email,
+            address: this.#address,
+            username: this.#username
+        }
+    }
+
+    getColumns() {
+        return ['first_name', 'last_name', 'birthdate', 'email', 'address', 'username', 'password'];
     }
 
     //setters
@@ -19,15 +62,15 @@ class User {
         this.#id = id;
     }
 
-    set firstName(firstName) {
-        if (firstName === '') {
-            throw new Error(`firstName field of User cannot be empty`);
+    set first_name(first_name) {
+        if (first_name === '') {
+            throw new Error(`first_name field of User cannot be empty`);
         }
-        this.#firstName = firstName;
+        this.#first_name = first_name;
     }
 
-    set lastName(lastName) {
-        this.#lastName = lastName;
+    set last_name(last_name) {
+        this.#last_name = last_name;
     }
 
     set birthdate(birthdate) {
@@ -49,8 +92,6 @@ class User {
     set username(username) {
         this.#username = username;
     }
-
-
 }
 
 module.exports = User;

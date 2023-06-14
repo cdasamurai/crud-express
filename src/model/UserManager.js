@@ -2,25 +2,13 @@ const connection = require('./db');
 const filterHelper = require('../services/FilterHelper');
 const {passwordHasher} = require('../services/PasswordHelper');
 const User = require('../entity/User');
+const EntityManager = require('./orm/EntityManager');
 
 async function insertUser(data) {
-    const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    //password hashing
     data.password = await passwordHasher(data.password)
+    const entityManager = new EntityManager();
 
-    let bodyResponse = {...data};
-    
-    return connection.promise().query(sql, Object.values(data))
-    .then(async ([rows]) => { 
-        bodyResponse.id = rows.insertId
-        //@TODO remove password from body
-        
-        return {status: 201, message: bodyResponse}
-    })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    return entityManager.insert(new User(), data, 'user');
 }
 
 async function updateUser(id, data) {
@@ -78,18 +66,11 @@ async function fetchOneUser(id) {
 
     return connection.promise().query(sql, id)
     .then(async ([rows]) => {
+        //instanciate user object
         let user = new User();
-        let userResult = rows[0];
-        /*user.id = userResult.id;
-        user.firstName = userResult.first_name;
-        user.lastName = userResult.last_name;
-        user.username = userResult.username;
-        user.address = userResult.address;
-        user.birthdate = userResult.birthdate;*/
-
+        //set user object
         Object.keys(rows[0]).map(item => { user[item] = rows[0][item] });
-        //return console.log(user);
-        
+
         return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: user}
     })
     .catch(error => {
