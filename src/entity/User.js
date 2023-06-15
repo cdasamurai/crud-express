@@ -57,6 +57,10 @@ class User {
         return ['first_name', 'last_name', 'birthdate', 'email', 'address', 'username', 'password'];
     }
 
+    forbiddenColumns() {
+        return ['password'];
+    }
+
     //setters
     set id(id) {
         this.#id = id;
