@@ -1,107 +1,97 @@
-const connection = require('./db');
-const filterHelper = require('../services/FilterHelper');
-const {passwordHasher} = require('../services/PasswordHelper');
-const User = require('../entity/User');
-const EntityManager = require('./orm/EntityManager');
+const connection = require("./db");
+const filterHelper = require("../services/FilterHelper");
+const { passwordHasher } = require("../services/PasswordHelper");
+const User = require("../entity/User");
+const EntityManager = require("./orm/EntityManager");
 
 async function insertUser(data) {
-    data.password = await passwordHasher(data.password)
-    const entityManager = new EntityManager();
+  data.password = await passwordHasher(data.password);
+  const entityManager = new EntityManager();
 
-    return entityManager.insert(new User(), data, 'user');
+  return entityManager.insert(new User(), data, "user");
 }
 
 async function updateUser(id, data) {
-    let sqlQuery = "UPDATE user SET ";
+  const entityManager = new EntityManager();
 
-    for (let key in itemValue = Object.keys(data)) {
-        sqlQuery += `${itemValue[key]} = ?, `
-    }
-
-    sqlQuery = sqlQuery.slice(0, sqlQuery.length - 2);
-
-    sqlQuery += ` WHERE id = ${id}`;
-
-    let bodyResponse = {...data};
-    
-    return connection.promise().query(sqlQuery, Object.values(data))
-    .then(async ([rows]) => { 
-        //bodyResponse.id = rows.insertId
-        //@TODO remove password from body
-
-        return {status: 201, message: bodyResponse}
-    })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+  return entityManager.update(data, data, "user", id);
 }
 
 async function deleteUser(id) {
-    let sqlQuery = `DELETE FROM user where id = ${id}`;
-    
-    return connection.promise().query(sqlQuery)
-    .then(async ([rows]) => { 
+  let sqlQuery = `DELETE FROM user where id = ${id}`;
 
-        return {status: 200, message: {}}
+  return connection
+    .promise()
+    .query(sqlQuery)
+    .then(async ([rows]) => {
+      return { status: 200, message: {} };
     })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    .catch((error) => {
+      return { status: 500, message: error };
+    });
 }
 
 async function fetchUser() {
-    const sql = "SELECT * FROM user";
-    
-    return connection.promise().query(sql)
-    .then(async ([rows]) => { 
-        return {status: 200, message: rows}
+  const sql = "SELECT * FROM user";
+
+  return connection
+    .promise()
+    .query(sql)
+    .then(async ([rows]) => {
+      return { status: 200, message: rows };
     })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    .catch((error) => {
+      return { status: 500, message: error };
+    });
 }
 
 async function fetchOneUser(id) {
-    const sql = "SELECT * FROM user WHERE id = ?";
+  const sql = "SELECT * FROM user WHERE id = ?";
 
-    return connection.promise().query(sql, id)
+  return connection
+    .promise()
+    .query(sql, id)
     .then(async ([rows]) => {
-        //instanciate user object
-        let user = new User();
-        //set user object
-        Object.keys(rows[0]).map(item => { user[item] = rows[0][item] });
+      //instanciate user object
+      let user = new User();
+      //set user object
+      Object.keys(rows[0]).map((item) => {
+        user[item] = rows[0][item];
+      });
 
-        return rows.length === 0 ? {status: 404, message: {}} : {status: 200, message: user}
+      return rows.length === 0
+        ? { status: 404, message: {} }
+        : { status: 200, message: user };
     })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    .catch((error) => {
+      return { status: 500, message: error };
+    });
 }
 
 async function fetchUserBy(filter) {
-    //search filter (that contain)
-    let {sql, values } = filterHelper.checkKindOfFilter(filter);
+  //search filter (that contain)
+  let { sql, values } = filterHelper.checkKindOfFilter(filter);
 
+  //order filter (sorting)
 
-    //order filter (sorting)
+  //date filter
 
-    //date filter 
-
-    return connection.promise().query(sql,values)
-    .then(async ([rows]) => { 
-        return {status: 200, message: rows}
+  return connection
+    .promise()
+    .query(sql, values)
+    .then(async ([rows]) => {
+      return { status: 200, message: rows };
     })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
-
+    .catch((error) => {
+      return { status: 500, message: error };
+    });
 }
 
 module.exports = {
-    insertUser,
-    fetchUser,
-    fetchOneUser,
-    fetchUserBy,
-    updateUser,
-    deleteUser
-}
+  insertUser,
+  fetchUser,
+  fetchOneUser,
+  fetchUserBy,
+  updateUser,
+  deleteUser,
+};

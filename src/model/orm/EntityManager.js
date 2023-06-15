@@ -12,14 +12,15 @@ class EntityManager extends AbstractEntityManager {
     return super.ExecuteInsert(sql, values, entity, tableName);
   }
   update(entity, dataEntity, tableName, id) {
-    let entityToInsert = super.EntityGenerator(entity, dataEntity);
+    let entityToUpdate = super.EntityGenerator(entity, dataEntity);
     let { sql, values } = super.SqlQueryGenerator(
       tableName,
-      entityToInsert,
-      "update"
+      entityToUpdate,
+      "update",
+      id
     );
 
-    return super.ExecuteInsert(sql, values, entity, tableName);
+    return super.ExecuteInsert(sql, values, entity, tableName, id);
   }
 }
 
