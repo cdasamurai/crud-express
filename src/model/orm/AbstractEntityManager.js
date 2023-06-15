@@ -8,7 +8,7 @@ class AbstractEntityManager {
         return entity;
     }
 
-    SqlQueryGenerator(tableName, entity, queryType) {
+    SqlQueryGenerator(tableName, entity, queryType, id) {
         const columns = entity.getColumns().join(', ')
         const preparedValues = entity.getColumns().map(() => `?`).join(', ')
 
@@ -22,10 +22,10 @@ class AbstractEntityManager {
 
         switch (queryType) {
             case 'insert': sql = `INSERT INTO ${tableName} (${columns}) VALUES (${preparedValues})`;
-            break;
-            case 'update': sql = `UPDATE ${tableName} SET ${columns} WHERE id = ?`;
                 break;
-            case 'delete': sql = `DELETE FROM ${tableName} WHERE id = ?`;
+            case 'update': sql = `UPDATE ${tableName} SET ${columns} WHERE id = ${id}`;
+                break;
+            case 'delete': sql = `DELETE FROM ${tableName} WHERE id = ${id}`;
                 break;
             case 'select_all': sql = `SELECT * FROM ${tableName}`;
                 break;
@@ -36,6 +36,21 @@ class AbstractEntityManager {
     }
 
     async ExecuteInsert(sql, values, entity, tableName) {
+        return connection.promise().query(sql, values)
+            .then(async ([rows]) => {
+                return connection.promise().query(`SELECT * FROM ${tableName} WHERE id = ?`, [rows.insertId])
+                    .then(async ([rows]) => {
+                        let newEntity = this.EntityGenerator(entity, rows[0])
+
+                        return {status: 201, message: newEntity}
+                    })
+            })
+            .catch(error => {
+                return {status: 500, message: error}
+            })
+    }
+
+    async ExecuteUpdate(sql, id, values, entity, tableName) {
         return connection.promise().query(sql, values)
             .then(async ([rows]) => {
                 return connection.promise().query(`SELECT * FROM ${tableName} WHERE id = ?`, [rows.insertId])

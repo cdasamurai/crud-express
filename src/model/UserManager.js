@@ -12,41 +12,15 @@ async function insertUser(data) {
 }
 
 async function updateUser(id, data) {
-    let sqlQuery = "UPDATE user SET ";
+    const entityManager = new EntityManager();
 
-    for (let key in itemValue = Object.keys(data)) {
-        sqlQuery += `${itemValue[key]} = ?, `
-    }
-
-    sqlQuery = sqlQuery.slice(0, sqlQuery.length - 2);
-
-    sqlQuery += ` WHERE id = ${id}`;
-
-    let bodyResponse = {...data};
-    
-    return connection.promise().query(sqlQuery, Object.values(data))
-    .then(async ([rows]) => { 
-        //bodyResponse.id = rows.insertId
-        //@TODO remove password from body
-
-        return {status: 201, message: bodyResponse}
-    })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    return entityManager.update(new User(), data, 'user', id);
 }
 
 async function deleteUser(id) {
-    let sqlQuery = `DELETE FROM user where id = ${id}`;
-    
-    return connection.promise().query(sqlQuery)
-    .then(async ([rows]) => { 
+    const entityManager = new EntityManager();
 
-        return {status: 200, message: {}}
-    })
-    .catch(error => {
-        return {status: 500, message: error}
-    })
+    return entityManager.delete(new User(), 'user', id);
 }
 
 async function fetchUser() {
