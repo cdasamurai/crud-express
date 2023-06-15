@@ -11,7 +11,7 @@ const securityMiddleware = require('../middleware/securityMiddleware');
 router.post('/', createUserController)
 
 /* GET : fetch all users . */
-router.get('/', securityMiddleware, readUserController)
+router.get('/', /*securityMiddleware, */readUserController)
 
 /* GET : fetch one user . */
 router.get('/:id', readOneUserController)
