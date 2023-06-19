@@ -3,22 +3,28 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors')
 
 const indexRouter = require('./src/routes/index');
 const usersRouter = require('./src/routes/users');
 const authRouter = require('./src/routes/auth');
+const uploadRouter = require('./src/routes/upload');
 
 const app = express();
+
+app.use(cors({origin: 'http://127.0.0.1:5500'}));
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/authentication', authRouter);
+app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
