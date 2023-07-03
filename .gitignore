@@ -6,3 +6,4 @@ jwtRS256.key.pub
 src/.DS_Store
 src/controller/.DS_Store
 .DS_Store
+public/uploads
