@@ -16,6 +16,7 @@ function login({email, password}) {
 
             const token = jwt.sign({ userId: rows[0].id }, privateKey, { algorithm: 'RS256' });
 
+
             return {status: 200, message: {token: token}}
         })
 }
