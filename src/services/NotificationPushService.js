@@ -1,4 +1,4 @@
-const { Expo } = require('expo-server-sdk')
+const { Expo } = require('expo-server-sdk');
 
 async function notificationSender({expo_push_token}, title, body) {
     let expo = new Expo({accessToken: process.env.EXPO_ACCESS_TOKEN});

@@ -3,6 +3,7 @@ const filterHelper = require('../services/FilterHelper');
 const {passwordHasher} = require('../services/PasswordHelper');
 const User = require('../entity/User');
 const NotificationPushService = require('../services/NotificationPushService');
+const EmailSenderService = require('../services/EmailSenderService');
 
 async function insertUser(data) {
     const sql = "INSERT INTO user (first_name, last_name, username, address, birthdate, password, email, expo_push_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -15,7 +16,8 @@ async function insertUser(data) {
     .then(async ([rows]) => { 
         bodyResponse.id = rows.insertId;
         NotificationPushService("REGISTRATION", {expo_push_token: data.expo_push_token});
-        
+        EmailSenderService("REGISTRATION", {email: data.email, fullName: data.first_name + ' ' + data.last_name});
+
         return {status: 201, message: bodyResponse}
     })
     .catch(error => {
