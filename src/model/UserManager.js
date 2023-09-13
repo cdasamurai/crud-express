@@ -25,7 +25,12 @@ async function insertUser(data) {
     })
 }
 
-async function updateUser(id, data) {
+async function updateUser(id, data, isPasswordReset) {
+    if (isPasswordReset) {
+        data.password = await passwordHasher(data.password);
+        data.password_token = "";
+    }
+
     let sqlQuery = "UPDATE user SET ";
 
     for (let key in itemValue = Object.keys(data)) {
@@ -40,8 +45,6 @@ async function updateUser(id, data) {
     
     return connection.promise().query(sqlQuery, Object.values(data))
     .then(async ([rows]) => { 
-        //bodyResponse.id = rows.insertId
-        //@TODO remove password from body
 
         return {status: 201, message: bodyResponse}
     })
@@ -99,21 +102,23 @@ async function fetchOneUser(id) {
     })
 }
 
-async function fetchUserBy(filter) {
-    //search filter (that contain)
+async function fetchUserBy(res, filter) {
     let {sql, values } = filterHelper.checkKindOfFilter(filter);
-
-
-    //order filter (sorting)
-
-    //date filter 
+    if ((filter.token) && filter.token === "") {
+        return res.status(400).json("Something went wrong")
+    }
 
     return connection.promise().query(sql,values)
-    .then(async ([rows]) => { 
+    .then(async ([rows]) => {
+
+        if (rows.length === 0) {
+            return res.status(400).json("Something went wrong");
+        }
+
         return {status: 200, message: rows}
     })
     .catch(error => {
-        return {status: 500, message: error}
+        return res.status(500).message(error)
     })
 
 }

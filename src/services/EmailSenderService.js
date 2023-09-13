@@ -4,7 +4,7 @@ const mailjet = Mailjet.apiConnect(
     process.env.MJ_APIKEY_PRIVATE,
 );
 
-function emailSender({email, fullName}, {subject, body}) {
+function emailSender({email, fullName = null}, {subject, body}) {
     const request = mailjet
         .post('send', { version: 'v3.1' })
         .request({
@@ -39,7 +39,8 @@ function kindChecker(kind, data) {
     switch (true) {
         case kind === "REGISTRATION": emailSender(data, {subject: "E mail de confirmation", body: "Votre inscription a bien été prise en compte"});
             break;
-        case kind === "FORGOTTEN_PASSWORD":
+        case kind === "PASSWORD_FORGOTTEN" :
+            emailSender(data, {subject: "Votre nouveau mot de passe", body: `Cliquez sur ce lien pour générer votre nouveau mot de passe : http://localhost:3000/password-reset/${data.token}`})
             break;
         case kind === "SUCCESS_ORDER":
             break;
